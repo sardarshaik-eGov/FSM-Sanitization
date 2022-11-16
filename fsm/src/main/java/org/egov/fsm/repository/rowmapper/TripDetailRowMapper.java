@@ -54,11 +54,11 @@ public class TripDetailRowMapper implements ResultSetExtractor<List<VehicleTripD
 				Long lastModifiedTime = rs.getLong("lastmodifiedtime");
 				AuditDetails audit = AuditDetails.builder().createdBy(createdBy).lastModifiedBy(lastModifiedBy).createdTime(createdTime)
 						.lastModifiedTime(lastModifiedTime).build();
-				tripDetailMap.put(id, VehicleTripDetail.builder().id(id).tenantId(tenantId).referenceNo(referenceno).referenceStatus(referencestatus)
+				tripDetailMap.put(id, VehicleTripDetail.builder().id(id).trip_id(trip_id).tenantId(tenantId).referenceNo(referenceno).referenceStatus(referencestatus)
 						.additionalDetails(additionaldetails).status(VehicleTripDetail.StatusEnum.fromValue(status)).itemStartTime(itemstarttime)
 						.itemEndTime(itemendtime).volume(volume).auditDetails(audit).build());
 			}else {
-				tripDetailMap.put(id, VehicleTripDetail.builder().id(id).tenantId(tenantId).referenceNo(referenceno).referenceStatus(referencestatus)
+				tripDetailMap.put(id, VehicleTripDetail.builder().id(id).trip_id(trip_id).tenantId(tenantId).referenceNo(referenceno).referenceStatus(referencestatus)
 						.additionalDetails(additionaldetails).status(VehicleTripDetail.StatusEnum.fromValue(status)).itemStartTime(itemstarttime)
 						.itemEndTime(itemendtime).volume(volume).build());
 			}

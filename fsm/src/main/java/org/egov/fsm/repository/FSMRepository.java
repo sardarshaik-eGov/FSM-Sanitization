@@ -175,7 +175,7 @@ public class FSMRepository {
 		List<VehicleTripDetail> tripDetails = null;
 		List<Object> preparedStmtList = new ArrayList<>();
 		String query = fsmQueryBuilder.getTripDetailSarchQuery(tripId, numOfRecords, preparedStmtList);
-		log.info("query for decreseTrip:: "+query);
+		log.info("query for decreseTrip:: "+numOfRecords+":: query :: "+query);
 		try {
 			tripDetails = jdbcTemplate.query(query, preparedStmtList.toArray(), detailMapper);
 			
@@ -187,15 +187,12 @@ public class FSMRepository {
 		return tripDetails;
 	}
 /**
-// * This function is to update the trip status to inactive while decreasing the trips during trip update
-// * @param tripDetails
+ * This function is to update the trip status to inactive while decreasing the trips during trip update
+ * @param vehicleTripList
  */
-	public void updateVehicleToInActive(List<VehicleTripDetail> tripDetails) {
-		List<VehicleTrip> vehicleTripList = new ArrayList<VehicleTrip>();
-		VehicleTrip vehicleTrip = new VehicleTrip();
-		vehicleTrip.setTripDetails(tripDetails);
-		vehicleTripList.add(vehicleTrip);
-		if (vehicleTrip != null) {
+	//commented as  vehicleTripList is handled while calling updateVehicleToInActive function
+	public void updateVehicleToInActive(List<VehicleTrip> vehicleTripList) {
+		if (vehicleTripList != null) {
 			producer.push(config.getVehicleUpdateTripToInactive(), new VehicleTripRequest(null, vehicleTripList,null));
 		}
 	}

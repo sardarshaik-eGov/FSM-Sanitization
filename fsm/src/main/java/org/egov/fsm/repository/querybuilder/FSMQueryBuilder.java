@@ -35,7 +35,7 @@ public class FSMQueryBuilder {
 
 	public static final String GET_APPLICATION_LIST = "select applicationno from eg_fsm_application where oldapplicationno=? and tenantid=?";
 
-	public static final String GET_VEHICLE_TRIPS_LIST="SELECT * FROM eg_vehicle_trip_detail WHERE referenceno= ? order by createdtime desc ";
+	public static final String GET_VEHICLE_TRIPS_LIST="SELECT * FROM eg_vehicle_trip_detail WHERE referenceno= ? and status='ACTIVE' order by createdtime desc ";
 
 	public String getFSMSearchQuery(FSMSearchCriteria criteria, String dsoId, List<Object> preparedStmtList) {
 
