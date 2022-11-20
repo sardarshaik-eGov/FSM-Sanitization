@@ -10,6 +10,10 @@ import static org.egov.inbox.util.FSMConstants.FSM_VEHICLE_TRIP_MODULE;
 import static org.egov.inbox.util.FSMConstants.STATUSID;
 import static org.egov.inbox.util.FSMConstants.VEHICLE_LOG;
 import static org.egov.inbox.util.FSMConstants.WAITING_FOR_DISPOSAL_STATE;
+import static org.egov.inbox.util.TLConstants.BUSINESS_SERVICE_PARAM;
+import static org.egov.inbox.util.TLConstants.REQUESTINFO_PARAM;
+import static org.egov.inbox.util.TLConstants.SEARCH_CRITERIA_PARAM;
+import static org.egov.inbox.util.TLConstants.TENANT_ID_PARAM;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -18,7 +22,6 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -97,7 +100,6 @@ public class InboxService {
 		ProcessInstanceSearchCriteria processCriteria = criteria.getProcessSearchCriteria();
 		HashMap moduleSearchCriteria = criteria.getModuleSearchCriteria();
 		processCriteria.setTenantId(criteria.getTenantId());
-		Integer flag = 0;
 
 		Integer totalCount = 0;
 		if (!(processCriteria.getModuleName().equals(FSMConstants.SW)
@@ -113,11 +115,10 @@ public class InboxService {
 		if (requestInfo.getUserInfo().getRoles().get(0).getCode().equals(FSMConstants.FSM_DSO)) {
 			Map<String, Object> searcherRequestForDSO = new HashMap<>();
 			Map<String, Object> searchCriteriaForDSO = new HashMap<>();
-			searchCriteriaForDSO.put(FSMConstants.TENANT_ID_PARAM, criteria.getTenantId());
-
+			searchCriteriaForDSO.put(TENANT_ID_PARAM, criteria.getTenantId());
 			searchCriteriaForDSO.put(FSMConstants.OWNER_ID, requestInfo.getUserInfo().getUuid());
-			searcherRequestForDSO.put(FSMConstants.REQUESTINFO_PARAM, requestInfo);
-			searcherRequestForDSO.put(FSMConstants.SEARCH_CRITERIA_PARAM, searchCriteriaForDSO);
+			searcherRequestForDSO.put(REQUESTINFO_PARAM, requestInfo);
+			searcherRequestForDSO.put(SEARCH_CRITERIA_PARAM, searchCriteriaForDSO);
 			StringBuilder uri = new StringBuilder();
 			uri.append(config.getSearcherHost()).append(config.getFsmInboxDSoIDEndpoint());
 
@@ -207,10 +208,6 @@ public class InboxService {
 
 			}
 		}
-		Map<String, List<String>> tenantAndApplnNumbersMap = new HashMap<>();
-
-		// log.info("businessServiceName.contains(FSM_MODULE) ::: " +
-		// businessServiceName.contains(FSM_MODULE));
 
 		if (!ObjectUtils.isEmpty(processCriteria.getModuleName())
 				&& processCriteria.getModuleName().equalsIgnoreCase(FSMConstants.FSM_MODULE)) {
@@ -322,9 +319,9 @@ public class InboxService {
 						aggrMapInstance.put(COUNT,
 								((Integer) statusCountEntry.get(COUNT) + (Integer) aggrMapInstance.get(COUNT)));
 						aggrMapInstance.put(APPLICATIONSTATUS, (String) statusCountEntry.get(APPLICATIONSTATUS));
-						aggrMapInstance.put(FSMConstants.BUSINESS_SERVICE_PARAM,
-								(String) statusCountEntry.get(FSMConstants.BUSINESS_SERVICE_PARAM) + ","
-										+ (String) aggrMapInstance.get(FSMConstants.BUSINESS_SERVICE_PARAM));
+						aggrMapInstance.put(BUSINESS_SERVICE_PARAM,
+								(String) statusCountEntry.get(BUSINESS_SERVICE_PARAM) + ","
+										+ (String) aggrMapInstance.get(BUSINESS_SERVICE_PARAM));
 						aggrMapInstance.put(STATUSID,
 								(String) statusCountEntry.get(STATUSID) + "," + (String) aggrMapInstance.get(STATUSID));
 						matchFound = true;
@@ -332,8 +329,8 @@ public class InboxService {
 					} else {
 						tempStatusMap.put(COUNT, (Integer) statusCountEntry.get(COUNT));
 						tempStatusMap.put(APPLICATIONSTATUS, (String) statusCountEntry.get(APPLICATIONSTATUS));
-						tempStatusMap.put(FSMConstants.BUSINESS_SERVICE_PARAM,
-								(String) statusCountEntry.get(FSMConstants.BUSINESS_SERVICE_PARAM));
+						tempStatusMap.put(BUSINESS_SERVICE_PARAM,
+								(String) statusCountEntry.get(BUSINESS_SERVICE_PARAM));
 						tempStatusMap.put(STATUSID, (String) statusCountEntry.get(STATUSID));
 
 					}
@@ -358,32 +355,6 @@ public class InboxService {
 		response.setStatusMap(statusCountMap);
 		response.setItems(inboxes);
 		return response;
-
-	}
-
-	/**
-	 * @param businessServiceSlaMap
-	 * @param data                  -- application object
-	 * @return Description : Calculate ServiceSLA for each application for WS and SW
-	 */
-	private Long getApplicationServiceSla(Map<String, Long> businessServiceSlaMap, Object data) {
-
-		Long currentDate = System.currentTimeMillis(); // current time
-		ObjectMapper mapper = new ObjectMapper();
-		Map<String, Object> properties = mapper.convertValue(data, Map.class);
-		Map<String, Object> additionalDetails = (Map<String, Object>) properties.get("additionalDetails");
-		if (!ObjectUtils.isEmpty(additionalDetails.get("appCreatedDate"))
-				|| !Objects.isNull(additionalDetails.get("appCreatedDate"))) {
-			Long createdTime = ((Number) additionalDetails.get("appCreatedDate")).longValue();
-			Map<String, Object> history = (LinkedHashMap<String, Object>) ((ArrayList) properties.get("history"))
-					.get(0);
-			String businessService = (String) history.get("businessService");
-			Long businessServiceSLA = businessServiceSlaMap.get(businessService);
-
-			return Long.valueOf(
-					Math.round((businessServiceSLA - (currentDate - createdTime)) / ((double) (24 * 60 * 60 * 1000))));
-		}
-		return null;
 	}
 
 	public List<String> fetchVehicleStateMap(List<String> inputStatuses, RequestInfo requestInfo, String tenantId,
@@ -458,7 +429,7 @@ public class InboxService {
 						vehicleTripStatusMp.put(COUNT, trip.get(COUNT));
 						vehicleTripStatusMp.put(APPLICATIONSTATUS, appState.getApplicationStatus());
 						vehicleTripStatusMp.put(STATUSID, appState.getUuid());
-						vehicleTripStatusMp.put(FSMConstants.BUSINESS_SERVICE_PARAM, FSM_VEHICLE_TRIP_MODULE);
+						vehicleTripStatusMp.put(BUSINESS_SERVICE_PARAM, FSM_VEHICLE_TRIP_MODULE);
 					}
 
 					if (MapUtils.isNotEmpty(vehicleTripStatusMp))
@@ -639,71 +610,4 @@ public class InboxService {
 		return list;
 	}
 
-	private Map<String, String> fetchAppropriateServiceSearchMap(String businessServiceName, String moduleName) {
-		StringBuilder appropriateKey = new StringBuilder();
-		for (String businessServiceKeys : config.getBsServiceSearchMapping().keySet()) {
-			if (businessServiceKeys.contains(businessServiceName)) {
-				appropriateKey.append(businessServiceKeys);
-				break;
-			}
-		}
-		if (ObjectUtils.isEmpty(appropriateKey)) {
-			throw new CustomException("EG_INBOX_SEARCH_ERROR",
-					"Inbox service is not configured for the provided business services");
-		}
-		return config.getBsServiceSearchMapping().get(appropriateKey.toString());
-	}
-
-	private JSONArray fetchModuleSearchObjects(HashMap moduleSearchCriteria, List<String> businessServiceName,
-			String tenantId, RequestInfo requestInfo, Map<String, String> srvMap) {
-		JSONArray results = null;
-
-		if (CollectionUtils.isEmpty(srvMap) || StringUtils.isEmpty(srvMap.get("searchPath"))) {
-			throw new CustomException(ErrorConstants.INVALID_MODULE_SEARCH_PATH,
-					"search path not configured for the businessService : " + businessServiceName);
-		}
-		StringBuilder url = new StringBuilder(srvMap.get("searchPath"));
-		url.append("?tenantId=").append(tenantId);
-
-		Set<String> searchParams = moduleSearchCriteria.keySet();
-
-		searchParams.forEach((param) -> {
-
-			if (!param.equalsIgnoreCase("tenantId")) {
-				if (param.equalsIgnoreCase("limit"))
-					return;
-				if (moduleSearchCriteria.get(param) instanceof Collection) {
-					url.append("&").append(param).append("=");
-					url.append(StringUtils
-							.arrayToDelimitedString(((Collection<?>) moduleSearchCriteria.get(param)).toArray(), ","));
-				} else if (null != moduleSearchCriteria.get(param)) {
-					url.append("&").append(param).append("=").append(moduleSearchCriteria.get(param).toString());
-				}
-			}
-		});
-
-		log.info("\nfetchModulSearcheObjects URL :::: " + url.toString());
-
-		RequestInfoWrapper requestInfoWrapper = RequestInfoWrapper.builder().requestInfo(requestInfo).build();
-		Object result = serviceRequestRepository.fetchResult(url, requestInfoWrapper);
-
-		LinkedHashMap responseMap;
-		try {
-			responseMap = mapper.convertValue(result, LinkedHashMap.class);
-		} catch (IllegalArgumentException e) {
-			throw new CustomException(ErrorConstants.PARSING_ERROR,
-					"Failed to parse response of ProcessInstance Count");
-		}
-
-		JSONObject jsonObject = new JSONObject(responseMap);
-
-		try {
-			results = (JSONArray) jsonObject.getJSONArray(srvMap.get("dataRoot"));
-		} catch (Exception e) {
-			throw new CustomException(ErrorConstants.INVALID_MODULE_DATA,
-					" search api could not find data in serviceMap " + srvMap.get("dataRoot"));
-		}
-
-		return results;
-	}
 }

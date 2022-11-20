@@ -6,7 +6,9 @@ import static org.egov.inbox.util.TLConstants.LICENSE_NUMBER_PARAM;
 import static org.egov.inbox.util.TLConstants.LOCALITY_PARAM;
 import static org.egov.inbox.util.TLConstants.MOBILE_NUMBER_PARAM;
 import static org.egov.inbox.util.TLConstants.REQUESTINFO_PARAM;
+import static org.egov.inbox.util.TLConstants.SEARCH_CRITERIA_PARAM;
 import static org.egov.inbox.util.TLConstants.STATUS_PARAM;
+import static org.egov.inbox.util.TLConstants.TENANT_ID_PARAM;
 import static org.egov.inbox.util.TLConstants.USERID_PARAM;
 
 import java.util.ArrayList;
@@ -91,7 +93,7 @@ public class FSMInboxFilterService {
             Map<String, Object> searcherRequest = new HashMap<>();
             Map<String, Object> searchCriteria = new HashMap<>();
 
-            searchCriteria.put(FSMConstants.TENANT_ID_PARAM,criteria.getTenantId());
+            searchCriteria.put(TENANT_ID_PARAM,criteria.getTenantId());
 
             // Accomodating module search criteria in searcher request
             if(moduleSearchCriteria.containsKey(MOBILE_NUMBER_PARAM) && !CollectionUtils.isEmpty(userUUIDs)){
@@ -124,7 +126,7 @@ public class FSMInboxFilterService {
             }
 
             searcherRequest.put(REQUESTINFO_PARAM, requestInfo);
-            searcherRequest.put(FSMConstants.SEARCH_CRITERIA_PARAM, searchCriteria);
+            searcherRequest.put(SEARCH_CRITERIA_PARAM, searchCriteria);
 
             StringBuilder uri = new StringBuilder();
             uri.append(searcherHost).append(fsmInboxSearcherCountEndpoint);

@@ -109,7 +109,7 @@ public class InboxConfiguration {
 	@Value("${egov.internal.microservice.user.uuid}")
 	private String egovInternalMicroserviceUserUuid;
 
-	@Value("${parent.level.tenant.id}")
+	@Value("${state.level.tenant.id}")
 	private String parentLevelTenantId;
 
 	// ES Config
@@ -140,3 +140,4 @@ public class InboxConfiguration {
 	@Value("${es.search.default.sort.order}")
 	private String defaultSortOrder;
 }
+

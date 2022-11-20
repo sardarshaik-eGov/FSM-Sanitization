@@ -9,6 +9,7 @@ import org.egov.inbox.config.InboxConfiguration;
 import org.egov.inbox.web.model.InboxSearchCriteria;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
@@ -32,6 +33,9 @@ public class ElasticSearchQueryBuilder {
     private InboxConfiguration config;
 
     private EncryptionService encryptionService;
+
+    @Value(("${state.level.tenant.id}"))
+    private String stateLevelTenantId;
 
     @Autowired
     public ElasticSearchQueryBuilder(ObjectMapper mapper, InboxConfiguration config, EncryptionService encryptionService) {
@@ -125,7 +129,7 @@ public class ElasticSearchQueryBuilder {
                 if (criteria == null) {
                     return null;
                 }
-                criteria.setModuleSearchCriteria(encryptionService.encryptJson(criteria.getModuleSearchCriteria(), "InboxWnS", criteria.getTenantId(), HashMap.class));
+                criteria.setModuleSearchCriteria(encryptionService.encryptJson(criteria.getModuleSearchCriteria(), "InboxWnS", stateLevelTenantId, HashMap.class));
                 if (criteria == null) {
                     throw new CustomException("ENCRYPTION_NULL_ERROR", "Null object found on performing encryption");
                 }
@@ -137,7 +141,7 @@ public class ElasticSearchQueryBuilder {
             HashMap<String, Object> moduleSearchCriteria = criteria.getModuleSearchCriteria();
             //Adding "must" terms for the search parameters in criteria
             if (!StringUtils.isEmpty(moduleSearchCriteria.get("mobileNumber"))) {
-                mobileClause.add(getInnerNodeForMobileNumber(moduleSearchCriteria.get("mobileNumber").toString(), "Data.connectionHolders.mobileNumber.keyword", "Data.additionalDetails.ownerMobileNumber.keyword"));
+                mobileClause.add(getInnerNodeForMobileNumber(moduleSearchCriteria.get("mobileNumber").toString(), "Data.connectionHolders.mobileNumber.keyword", "Data.ownerMobileNumbers.keyword"));
             }
             if (!StringUtils.isEmpty(moduleSearchCriteria.get("locality"))) {
                 clauses.add(getInnerNode(moduleSearchCriteria.get("locality").toString(), "Data.additionalDetails.locality.keyword"));

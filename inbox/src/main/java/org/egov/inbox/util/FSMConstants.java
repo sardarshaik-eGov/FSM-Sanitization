@@ -19,21 +19,9 @@ public class FSMConstants {
 	public static final String STATUSID = "statusid";
 	public static final String COMPLETED_STATE = "COMPLETED";
 	public static final String VEHICLE_LOG = "vehicleLog";
-    public static final String TENANT_ID_PARAM = "tenantId";
-    public static final String REQUESTINFO_PARAM = "RequestInfo";
-    public static final String SW = "sw-services";
+	public static final String SW = "sw-services";
     public static final String WS = "ws-services";
-    public static final String BUSINESS_SERVICE_PARAM = "businessservice";
-    public static final String SEARCH_CRITERIA_PARAM = "searchCriteria";
 	public static final String BPA = "bpa-services";
 	public static final String CITIZEN = "CITIZEN";
-	public static final String MOBILE_NUMBER_PARAM = "mobileNumber";
-
-
-
-
-
-
-
 
 }
